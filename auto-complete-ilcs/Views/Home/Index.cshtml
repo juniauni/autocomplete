@@ -1,0 +1,166 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    #container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        width: 50%;
+        margin: auto;
+    }
+</style>
+
+<div id="container">
+    <br />
+    <figure class="text-center">
+        <blockquote class="blockquote">
+            <h4>ILCS Autocomplete Form Test</h4>
+        </blockquote>
+    </figure>
+
+    <div class="form-group">
+        <label for="country">Negara</label>
+        <input type="text" class="form-control" id="country" aria-describedby="country" placeholder="Input Negara">
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="port">Pelabuhan</label>
+        <input type="text" class="form-control" id="port" aria-describedby="port" placeholder="Input Pelabuhan">
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="productid">Barang</label>
+        <input type="text" class="form-control" id="productid" aria-describedby="productid" placeholder="Input Barang">
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="product">Deskripsi</label>
+        <textarea disabled="true" class="form-control" id="product" rows="3"></textarea>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="price">Harga Rp.</label>
+        <input type="number" class="form-control" id="price" aria-describedby="price" placeholder="0">
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="beacukai">Tarif Bea Masuk (%)</label>
+        <input type="number" class="form-control" disabled="true" id="beacukai" aria-describedby="beacukai" placeholder="0">
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="pbc">Harga * Tarif Bea Masuk, Rp.</label>
+        <input type="number" class="form-control" disabled="true" id="pbc" aria-describedby="pbc" placeholder="0">
+    </div>
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css" />
+        <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+        <script>
+            // negara
+            $(function () {
+                $("#country").autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: "https://insw-dev.ilcs.co.id/n/negara?",
+                            type: "GET",
+                            dataType: "json",
+                            data: { ur_negara: request.term },
+                            success: function (data) {
+                                response($.map(data.data, function (item) {
+                                    return { label: item.ur_negara, value: item.kd_negara };
+                                }));
+                            }, error: function (response) {
+                                alert: (respons.responsText)
+                            }, failure: function (response) {
+                                alert: (respons.responsText)
+                            }
+
+                        });
+                    },
+                    minLength: 3
+                });
+            });
+
+            // pelabuhan
+            $(function () {
+                $("#port").autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: "https://insw-dev.ilcs.co.id/n/pelabuhan?" + "kd_negara=" + $('#country').attr("data-id") + "&",
+                            type: "GET",
+                            dataType: "json",
+                            data: { ur_pelabuhan: request.term },
+                            success: function (data) {
+                                response($.map(data.data, function (item) {
+                                    return { label: item.ur_pelabuhan, value: item.kd_pelabuhan };
+                                }));
+                            }, error: function (response) {
+                                alert : (respons.responsText)
+                            }, failure: function (response) {
+                                alert: (respons.responsText)
+                            }
+                        });
+                    },
+                    minLength: 3
+                });
+            });
+
+            // barang
+            $(function () {
+                $('#productid').on('input', function () {
+                    var value = $(this).val();
+                    if (value) {
+                        $.ajax({
+                            url: "https://insw-dev.ilcs.co.id/n/barang?",
+                            type: "GET",
+                            data: { hs_code: value },
+                            dataType: "json",
+                            success: function (data) {
+                                $("#product").text(data.data[0].sub_header + data.data[0].uraian_id)
+
+                            }, error: function (response) {
+                                alert: (response.responsText)
+                            }, failure: function (response) {
+                                alert: (response.responsText)
+                            }
+                        });
+                    }
+                });
+            });
+
+            // tarif bea masuk
+            $(function () {
+                $('#productid').on('input', function () {
+                    var value = $(this).val();
+                    if (value) {
+                        $.ajax({
+                            url: "https://insw-dev.ilcs.co.id/n/tarif?",
+                            type: "GET",
+                            data: { hs_code: value },
+                            dataType: "json",
+                            success: function (data) {
+                                $("#beacukai").val(data.data[0].bm)
+                            }, error: function (response) {
+                                alert: (response.responsText)
+                            }, failure: function (response) {
+                                alert: (response.responsText)
+                            }
+                        });
+                    }
+                });
+            });
+
+            // harga * tarif bea masuk
+            $(function () {
+                $("#price").on('input', function () {
+                    $("#pbc").val(($("#price").val() * $("#beacukai").val()) / 100)
+                })
+            })
+        </script>
+    }
+</div>

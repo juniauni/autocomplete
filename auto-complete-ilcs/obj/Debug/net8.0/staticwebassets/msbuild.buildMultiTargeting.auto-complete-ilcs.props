@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\auto-complete-ilcs.props" />
+</Project>

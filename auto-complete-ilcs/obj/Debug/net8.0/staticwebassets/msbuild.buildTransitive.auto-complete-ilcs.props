@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\auto-complete-ilcs.props" />
+</Project>
